@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.5b22957e.css",
-    "main.js": "/static/js/main.fb6ca8b3.js",
+    "main.css": "/static/css/main.9b81b556.css",
+    "main.js": "/static/js/main.50b26222.js",
     "static/media/portfolio.gif": "/static/media/portfolio.ed6c89f1485f23014ebd.gif",
     "static/media/fa-solid-900.svg": "/static/media/fa-solid-900.9fa614346b4e81decc62.svg",
     "static/media/fa-brands-400.svg": "/static/media/fa-brands-400.6fcab609e2f62d5c3104.svg",
@@ -40,6 +40,7 @@
     "static/media/ui_ux_design.svg": "/static/media/ui_ux_design.42a2cdaf132097cc499e.svg",
     "static/media/manOnTable.svg": "/static/media/manOnTable.f861b03b5a2d1a28c198.svg",
     "static/media/muffito_logo.png": "/static/media/muffito_logo.a40e290031eaf389bde1.png",
+    "static/media/hazem_logo.png": "/static/media/hazem_logo.208a61a13e67f85a02bf.png",
     "static/media/deeplearning_ai_logo.png": "/static/media/deeplearning_ai_logo.f5e1bd288e7a2b30a390.png",
     "static/media/nptel_logo.png": "/static/media/nptel_logo.14bc947aebe4b57dd2bc.png",
     "static/media/delta.jpg": "/static/media/delta.543258fedf43ba37914f.jpg",
@@ -66,15 +67,14 @@
     "static/media/fullstack.svg": "/static/media/fullstack.32a1ffc74848a2ed7dbf.svg",
     "static/media/education.svg": "/static/media/education.d5cc42f042227db12468.svg",
     "index.html": "/index.html",
-    "static/media/hazem_logo.PNG": "/static/media/hazem_logo.ee9b7bb2a272887ff739.PNG",
     "static/media/googleAssistant.svg": "/static/media/googleAssistant.1c2312558eb2e5f04a45.svg",
     "static/media/talksCardBackAlt.svg": "/static/media/talksCardBackAlt.018d87225926eee9ccc3.svg",
     "static/media/talksCardBack.svg": "/static/media/talksCardBack.7dc8695e60efbc2baab8.svg",
-    "main.5b22957e.css.map": "/static/css/main.5b22957e.css.map",
-    "main.fb6ca8b3.js.map": "/static/js/main.fb6ca8b3.js.map"
+    "main.9b81b556.css.map": "/static/css/main.9b81b556.css.map",
+    "main.50b26222.js.map": "/static/js/main.50b26222.js.map"
   },
   "entrypoints": [
-    "static/css/main.5b22957e.css",
-    "static/js/main.fb6ca8b3.js"
+    "static/css/main.9b81b556.css",
+    "static/js/main.50b26222.js"
   ]
 }
