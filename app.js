@@ -176,33 +176,85 @@ function initStoryCanvas() {
 
         if (currentStoryStep === 1) { 
             // PHASE 1: MPC Kinematics
-            const carX = cw/4, carY = ch/2 + Math.sin(carX * 0.005 - time*2 - 0.5) * 80;
             
-            // Road Boundaries
-            sCtx.beginPath(); sCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)'; sCtx.lineWidth = 3;
-            for(let x=0; x<cw; x+=20) { let ry = ch/2 + Math.sin(x*0.005 - time*2)*80; x===0 ? sCtx.moveTo(x, ry-60) : sCtx.lineTo(x, ry-60); }
-            for(let x=0; x<cw; x+=20) { let ry = ch/2 + Math.sin(x*0.005 - time*2)*80; x===0 ? sCtx.moveTo(x, ry+60) : sCtx.lineTo(x, ry+60); }
+            // 1. Dynamic Curvy Road Math Function (Compound Sine Waves)
+            const getRoadY = (x, t) => ch/2 + Math.sin(x * 0.004 - t * 2.5) * 90 + Math.cos(x * 0.002 - t) * 40;
+            
+            // 2. Draw Road Boundaries
+            sCtx.beginPath(); sCtx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; sCtx.lineWidth = 3;
+            for(let x=0; x<cw; x+=20) { let ry = getRoadY(x, time); x===0 ? sCtx.moveTo(x, ry-70) : sCtx.lineTo(x, ry-70); }
+            for(let x=0; x<cw; x+=20) { let ry = getRoadY(x, time); x===0 ? sCtx.moveTo(x, ry+70) : sCtx.lineTo(x, ry+70); }
             sCtx.stroke();
             
-            // Reference Trajectory
-            sCtx.beginPath(); sCtx.setLineDash([10,15]); sCtx.strokeStyle = 'rgba(16, 185, 129, 0.5)';
-            for(let x=0; x<cw; x+=20) { let ry = ch/2 + Math.sin(x*0.005 - time*2)*80; x===0 ? sCtx.moveTo(x, ry) : sCtx.lineTo(x, ry); }
+            // 3. Draw Reference Trajectory (Centerline Target)
+            sCtx.beginPath(); sCtx.setLineDash([10,15]); sCtx.strokeStyle = 'rgba(16, 185, 129, 0.4)';
+            for(let x=0; x<cw; x+=20) { let ry = getRoadY(x, time); x===0 ? sCtx.moveTo(x, ry) : sCtx.lineTo(x, ry); }
             sCtx.stroke(); sCtx.setLineDash([]);
 
-            // Prediction Horizon Vector Map
-            sCtx.beginPath(); sCtx.strokeStyle = '#0ea5e9'; sCtx.lineWidth = 2; sCtx.moveTo(carX, carY);
-            let predY = carY;
-            for(let step=1; step<=15; step++) {
-                let px = carX + step*15, targetY = ch/2 + Math.sin(px*0.005 - time*2)*80;
-                predY += (targetY - predY)*0.25; sCtx.lineTo(px, predY);
+            // 4. Ego-Vehicle State Definition
+            const carX = cw * 0.2; // Keep car fixed on X-axis (treadmill effect)
+            // Introduce a slight continuous mathematical disturbance so the MPC visibly has to correct it
+            const carY = getRoadY(carX, time) + Math.sin(time * 4) * 15; 
+            const nextY = getRoadY(carX + 10, time);
+            const headingAngle = Math.atan2(nextY - carY, 10);
+
+            // 5. Draw MPC Prediction Horizon (N-steps forward)
+            sCtx.beginPath(); 
+            sCtx.strokeStyle = '#f59e0b'; // Amber for prediction lines
+            sCtx.lineWidth = 2; 
+            sCtx.moveTo(carX, carY);
+            
+            let simX = carX;
+            let simY = carY;
+            const horizonSteps = 20; // N=20
+            
+            // Plot the line
+            for(let step=1; step<=horizonSteps; step++) {
+                simX += 15; // Step distance
+                let targetY = getRoadY(simX, time);
+                // Simulate MPC optimizer converging back to the target reference line
+                simY += (targetY - simY) * 0.18; 
+                sCtx.lineTo(simX, simY);
             }
             sCtx.stroke();
+            
+            // Plot discrete nodes on the horizon line
+            simX = carX; simY = carY;
+            for(let step=1; step<=horizonSteps; step++) {
+                simX += 15;
+                let targetY = getRoadY(simX, time);
+                simY += (targetY - simY) * 0.18; 
+                sCtx.fillStyle = '#f59e0b';
+                sCtx.fillRect(simX - 2, simY - 2, 4, 4);
+            }
 
-            // Vehicle Body
-            sCtx.save(); sCtx.translate(carX, carY);
-            sCtx.rotate(Math.atan2((ch/2 + Math.sin((carX+5)*0.005 - time*2 - 0.5)*80) - carY, 5));
-            sCtx.fillStyle = '#0ea5e9'; sCtx.fillRect(-15, -10, 30, 20); sCtx.restore();
-            sCtx.fillStyle = '#0ea5e9'; sCtx.font = "10px monospace"; sCtx.fillText("MPC N=15", carX+30, carY-40);
+            // 6. Draw Ego-Vehicle Box
+            sCtx.save(); 
+            sCtx.translate(carX, carY);
+            sCtx.rotate(headingAngle);
+            
+            // Vehicle Chassis (Moving Box)
+            sCtx.fillStyle = '#0f172a'; // Dark slate interior
+            sCtx.fillRect(-20, -12, 40, 24); 
+            sCtx.strokeStyle = '#0ea5e9'; // Cyan glowing border
+            sCtx.lineWidth = 2;
+            sCtx.strokeRect(-20, -12, 40, 24);
+            
+            // Heading Vector (Ego's direct forward orientation)
+            sCtx.beginPath();
+            sCtx.moveTo(0, 0);
+            sCtx.lineTo(35, 0);
+            sCtx.strokeStyle = '#10b981'; // Emerald green
+            sCtx.lineWidth = 2;
+            sCtx.stroke();
+            
+            sCtx.restore();
+            
+            // 7. System Tracking Labels
+            sCtx.fillStyle = '#0ea5e9'; sCtx.font = "10px monospace"; 
+            sCtx.fillText("EGO-VEHICLE", carX - 25, carY - 25);
+            sCtx.fillStyle = '#f59e0b';
+            sCtx.fillText("PREDICTION HORIZON (N=20)", carX + 60, carY - 45);
             
         } else if (currentStoryStep === 2) { 
             // PHASE 2: Vision DNNs
