@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Hazem Fahmy | Autonomous Systems R&D</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        :root {
+            --color-bg: #f8fafc;
+            --color-card: #ffffff;
+            --color-accent: #0284c7;
+        }
+        body {
+            background-color: var(--color-bg);
+            font-family: system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+        }
+        .hud-overlay {
+            background: linear-gradient(rgba(255, 255, 255, 0) 50%, rgba(241, 245, 249, 0.5) 50%), linear-gradient(90deg, rgba(2, 132, 199, 0.02), rgba(16, 185, 129, 0.02));
+            background-size: 100% 4px, 6px 100%;
+        }
+        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        
+        /* Component Specific Styles */
+        .skill-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .skill-dot.active { background-color: #0ea5e9; box-shadow: 0 0 6px rgba(14, 165, 233, 0.4); }
+        .skill-dot.inactive { background-color: #e2e8f0; }
+        
+        .story-step { cursor: pointer; transition: all 0.3s ease; padding-left: 1.5rem; border-left: 3px solid #e2e8f0; opacity: 0.6; position: relative; }
+        .story-step:hover { opacity: 0.9; border-left-color: #94a3b8; }
+        .story-step.active { opacity: 1; border-left-color: #0ea5e9; }
+        .story-step::before { content: ''; position: absolute; left: -7px; top: 0; width: 11px; height: 11px; border-radius: 50%; background-color: #e2e8f0; transition: all 0.3s ease; }
+        .story-step.active::before { background-color: #0ea5e9; box-shadow: 0 0 10px rgba(14, 165, 233, 0.5); }
+        .vis-container { background: radial-gradient(circle at center, #0f172a 0%, #020617 100%); box-shadow: inset 0 0 30px rgba(0,0,0,0.8); }
+    </style>
+</head>
+<body class="text-slate-800 antialiased relative text-[17px] leading-relaxed">
+
+    <canvas id="neuralCanvas" class="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none opacity-40"></canvas>
+    <div class="fixed inset-0 hud-overlay -z-10 pointer-events-none"></div>
+
+    <div class="w-full fixed top-0 z-50 flex justify-center pt-4 pointer-events-none px-4">
+        <header class="w-full max-w-5xl pointer-events-auto bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-2xl transition-all duration-300">
+            <div class="px-6 h-16 flex items-center justify-between">
+                <a href="#home" class="group flex items-center gap-3 font-mono tracking-tight">
+                    <div class="relative flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-600"></span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg font-black text-slate-900 tracking-widest group-hover:text-sky-600 transition-colors">HAZEM FAHMY</span>
+                        <span class="text-[10px] bg-slate-100 text-slate-500 border border-slate-200 px-1.5 py-0.5 rounded uppercase tracking-widest font-semibold">Ph.D.</span>
+                    </div>
+                </a>
+                <nav class="hidden md:flex items-center gap-2 font-mono text-xs uppercase tracking-wider font-bold" id="nav-menu">
+                    <a href="#home" data-target="home" class="nav-link px-4 py-2 text-sky-600 bg-sky-50 border border-sky-100 rounded-lg shadow-sm transition-all">Home</a>
+                    <a href="#exp" data-target="exp" class="nav-link px-4 py-2 text-slate-500 hover:text-sky-600 rounded-lg transition-all hover:bg-slate-50">Experience</a>
+                    <a href="#pubs" data-target="pubs" class="nav-link px-4 py-2 text-slate-500 hover:text-sky-600 rounded-lg transition-all hover:bg-slate-50">Projects</a>
+                </nav>
+            </div>
+        </header>
+    </div>
+
+    <main id="app-root" class="max-w-6xl mx-auto px-6 relative z-10 pt-24 pb-16 min-h-screen">
+        </main>
+
+    <footer class="w-full bg-slate-950 text-slate-400 py-16 border-t border-slate-900 font-mono text-xs relative overflow-hidden">
+        <div class="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 relative z-10">
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 text-slate-300 font-bold uppercase tracking-widest text-sm mb-4">
+                    <div class="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></div> System_Identity
+                </div>
+                <p class="leading-relaxed text-slate-500 max-w-xs">Architecting automated testing frameworks and diagnostic models for robust cyber-physical infrastructures.</p>
+                <div class="inline-block mt-4 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded text-[10px] uppercase tracking-widest text-sky-400">STATUS: ACTIVE_NODE</div>
+            </div>
+            <div class="space-y-4">
+                <div class="text-slate-300 font-bold uppercase tracking-widest text-sm mb-4">Navigation</div>
+                <ul class="space-y-3">
+                    <li><a href="#home" class="hover:text-sky-400 transition-colors flex items-center gap-2"><span class="text-slate-700">›</span> Home Protocol</a></li>
+                    <li><a href="#exp" class="hover:text-sky-400 transition-colors flex items-center gap-2"><span class="text-slate-700">›</span> Experience Matrix</a></li>
+                    <li><a href="#pubs" class="hover:text-sky-400 transition-colors flex items-center gap-2"><span class="text-slate-700">›</span> Projects & Research</a></li>
+                </ul>
+            </div>
+            <div class="space-y-4">
+                <div class="text-slate-300 font-bold uppercase tracking-widest text-sm mb-4">Verification_Hash</div>
+                <div class="bg-slate-900 border border-slate-800 p-3 rounded font-mono text-[10px] text-slate-500 break-all select-all">
+                    sha256:7a4f9e1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9
+                </div>
+            </div>
+        </div>
+        <div class="max-w-6xl mx-auto px-6 mt-16 pt-8 border-t border-slate-800/50 flex justify-between items-center z-10 relative">
+            <p class="font-bold text-slate-500">&copy; 2026 Dr. Hazem Fahmy. Compiled securely.</p>
+            <div class="text-[10px] font-mono uppercase tracking-widest text-slate-600 flex items-center gap-2">
+                <span class="text-emerald-500">■</span> System latency: 0.04ms
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
