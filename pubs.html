@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Hazem Fahmy | Projects</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        :root {
+            --color-bg: #f8fafc;
+            --color-card: #ffffff;
+            --color-accent: #0284c7;
+            --color-accent-dim: rgba(2, 132, 199, 0.1);
+        }
+        body {
+            background-color: var(--color-bg);
+            font-family: system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+        }
+        .hud-overlay {
+            background: linear-gradient(rgba(255, 255, 255, 0) 50%, rgba(241, 245, 249, 0.5) 50%), linear-gradient(90deg, rgba(2, 132, 199, 0.02), rgba(16, 185, 129, 0.02));
+            background-size: 100% 4px, 6px 100%;
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased relative text-[17px] leading-relaxed">
+
+    <canvas id="neuralCanvas" class="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none opacity-40"></canvas>
+    <div class="fixed inset-0 hud-overlay -z-10 pointer-events-none"></div>
+
+    <header class="sticky top-0 z-50 bg-white/95 border-b border-slate-200 shadow-sm">
+        <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="index.html" class="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2 font-mono">
+                HAZEM FAHMY <span class="text-xs bg-sky-100 text-sky-700 border border-sky-300 px-2 py-1 rounded">Ph.D.</span>
+            </a>
+            <nav class="hidden md:flex space-x-8 text-sm font-mono uppercase tracking-wider text-slate-600 font-bold">
+                <a href="index.html" class="hover:text-sky-600 transition-colors">Profile</a>
+                <a href="exp.html" class="hover:text-sky-600 transition-colors">Experience & Education</a>
+                <a href="pubs.html" class="text-sky-600 transition-colors">Projects</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 relative z-10">
+
+        <section id="github-projects" class="py-20 reveal">
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-4 flex items-center gap-3 font-mono">
+                <span class="text-sky-600">■</span> Open Source & GitHub Repositories
+            </h2>
+            <p class="text-slate-600 mb-10 max-w-3xl">
+                Functional core implementation packages developed during R&D lifecycles to support automated debugging, safety verification, and edge-case analysis in Deep Neural Networks (DNNs).
+            </p>
+            
+            <div class="grid md:grid-cols-3 gap-6">
+                <a href="https://github.com/hazem-fahmy" target="_blank" class="group block p-6 bg-white border border-slate-200 rounded-xl hover:shadow-md hover:border-sky-300 transition-all shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-mono font-bold px-2 py-1 bg-sky-50 text-sky-700 border border-sky-200 rounded">Python / TensorFlow</span>
+                        <svg class="w-5 h-5 text-slate-400 group-hover:text-sky-600 transition-colors" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.162 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 group-hover:text-sky-600 transition-colors mb-2">HUDD</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed mb-4">Heatmap-based Unsupervised Deep Debugging framework for tracking activation maps to automatically isolate systematic DNN tracking failures.</p>
+                    <span class="text-xs text-sky-600 font-mono font-bold inline-flex items-center gap-1 group-hover:underline">View Repository &rarr;</span>
+                </a>
+
+                <a href="https://github.com/hazem-fahmy" target="_blank" class="group block p-6 bg-white border border-slate-200 rounded-xl hover:shadow-md hover:border-sky-300 transition-all shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-mono font-bold px-2 py-1 bg-sky-50 text-sky-700 border border-sky-200 rounded">C# / Unity / Python</span>
+                        <svg class="w-5 h-5 text-slate-400 group-hover:text-sky-600 transition-colors" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.162 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 group-hover:text-sky-600 transition-colors mb-2">SEDE</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed mb-4">Simulator-guided Explanation and Debugging Engine using virtual environments to synthesize high-fidelity edge-case test distributions.</p>
+                    <span class="text-xs text-sky-600 font-mono font-bold inline-flex items-center gap-1 group-hover:underline">View Repository &rarr;</span>
+                </a>
+
+                <a href="https://github.com/hazem-fahmy" target="_blank" class="group block p-6 bg-white border border-slate-200 rounded-xl hover:shadow-md hover:border-sky-300 transition-all shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-mono font-bold px-2 py-1 bg-sky-50 text-sky-700 border border-sky-200 rounded">Python / Keras / XAI</span>
+                        <svg class="w-5 h-5 text-slate-400 group-hover:text-sky-600 transition-colors" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.162 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 group-hover:text-sky-600 transition-colors mb-2">SAFE</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed mb-4">Safety Analysis & Feature Extraction engine providing unsupervised clustering metrics for black-box and white-box structural verification blocks.</p>
+                    <span class="text-xs text-sky-600 font-mono font-bold inline-flex items-center gap-1 group-hover:underline">View Repository &rarr;</span>
+                </a>
+            </div>
+        </section>
+
+        <section id="publications" class="py-12 border-t border-slate-200 reveal mb-16">
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-12 flex items-center gap-3 font-mono">
+                <span class="text-sky-600">■</span> Peer-Reviewed Publication Record
+            </h2>
+            <div class="space-y-6">
+                
+                <a href="https://doi.org/10.1145/3643671" target="_blank" class="group block p-6 bg-white border border-slate-200 rounded-xl hover:border-sky-400 hover:shadow-md transition-all shadow-sm">
+                    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <span class="text-[11px] font-mono tracking-widest bg-sky-50 text-sky-700 border border-sky-200 px-2 py-1 rounded uppercase font-bold">ACM TOSEM [2024]</span>
+                            <h3 class="text-xl font-bold text-slate-900 mt-3 group-hover:text-sky-600 transition-colors">Safety Analysis of Image-processing DNNs via Clustering-based Approaches</h3>
+                            <p class="text-xs font-mono text-sky-600 mt-1 font-bold">Published in ACM Transactions on Software Engineering & Methodology (DOI: 10.1145/3643671)</p>
+                            <p class="text-sm text-slate-600 mt-3 italic bg-slate-50 p-4 rounded border border-slate-200">
+                                <strong>Abstract:</strong> This work introduces robust white-box and black-box safety cluster architectures to parse latent execution spaces within deep vision convolutional structures. By implementing dimension reduction alongside unsupervised feature isolators, the framework automatically identifies operational vulnerability pockets, enabling focused retraining blocks that minimize regression risks.
+                            </p>
+                            <span class="inline-flex items-center text-xs text-sky-600 font-mono mt-4 font-bold gap-1 group-hover:underline">
+                                🔗 CrossRef Core Repository Link &rarr;
+                            </span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="https://doi.org/10.1145/3569935" target="_blank" class="group block p-6 bg-white border border-slate-200 rounded-xl hover:border-sky-400 hover:shadow-md transition-all shadow-sm">
+                    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <span class="text-[11px] font-mono tracking-widest bg-sky-50 text-sky-700 border border-sky-200 px-2 py-1 rounded uppercase font-bold">ACM TOSEM / ASE [2023]</span>
+                            <h3 class="text-xl font-bold text-slate-900 mt-3 group-hover:text-sky-600 transition-colors">Simulator-based Explanation and Debugging of Hazard-triggering Events in DNN-based Safety-critical Systems</h3>
+                            <p class="text-xs font-mono text-sky-600 mt-1 font-bold">Published in ACM TOSEM & Journal-first Track at 38th ACM/IEEE International Conference on Automated Software Engineering</p>
+                            <p class="text-sm text-slate-600 mt-3 italic bg-slate-50 p-4 rounded border border-slate-200">
+                                <strong>Abstract:</strong> Proposes a testing framework linking virtual simulators (Unity/Blender) with explainable intelligence models (XAI). The pipeline generates synthetic variants around failure edges to deduce exact environmental metrics (lighting, occlusion angles) that cause hazard triggers in neural steering networks.
+                            </p>
+                            <span class="inline-flex items-center text-xs text-sky-600 font-mono mt-4 font-bold gap-1 group-hover:underline">
+                                🔗 CrossRef Core Repository Link &rarr;
+                            </span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="https://doi.org/10.1145/3510454.3516858" target="_blank" class="group block p-6 bg-white border border-slate-200 rounded-xl hover:border-sky-400 hover:shadow-md transition-all shadow-sm">
+                    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <span class="text-[11px] font-mono tracking-widest bg-sky-50 text-sky-700 border border-sky-200 px-2 py-1 rounded uppercase font-bold">ICSE, USA [2022]</span>
+                            <h3 class="text-xl font-bold text-slate-900 mt-3 group-hover:text-sky-600 transition-colors">HUDD: A Tool to Debug DNNs for Safety Analysis</h3>
+                            <p class="text-xs font-mono text-sky-600 mt-1 font-bold">Presented at the 44th ACM International Conference on Software Engineering (DOI: 10.1145/3510454.3516858)</p>
+                            <p class="text-sm text-slate-600 mt-3 italic bg-slate-50 p-4 rounded border border-slate-200">
+                                <strong>Abstract:</strong> Demonstrates HUDD (Heatmap-based Unsupervised Deep Debugging), an automated software engineering utility tracking activation maps to identify error root-causes. By clustering uniform activation patterns, the framework isolates systematic model tracking failures without human intervention with 93% verified purity.
+                            </p>
+                            <span class="inline-flex items-center text-xs text-sky-600 font-mono mt-4 font-bold gap-1 group-hover:underline">
+                                🔗 CrossRef Core Repository Link &rarr;
+                            </span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="https://doi.org/10.1145/3550271" target="_blank" class="group block p-6 bg-white border border-slate-200 rounded-xl hover:border-sky-400 hover:shadow-md transition-all shadow-sm">
+                    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <span class="text-[11px] font-mono tracking-widest bg-sky-50 text-sky-700 border border-sky-200 px-2 py-1 rounded uppercase font-bold">ACM TOSEM [2022]</span>
+                            <h3 class="text-xl font-bold text-slate-900 mt-3 group-hover:text-sky-600 transition-colors">Black-Box Safety Analysis and Retraining of DNNs Based on Feature Extraction and Clustering</h3>
+                            <p class="text-xs font-mono text-sky-600 mt-1 font-bold">Published in ACM Transactions on Software Engineering & Methodology (DOI: 10.1145/3550271)</p>
+                            <p class="text-sm text-slate-600 mt-3 italic bg-slate-50 p-4 rounded border border-slate-200">
+                                <strong>Abstract:</strong> Outlines black-box model analysis strategies where internal weights remain inaccessible. The introduced feature-extraction methodology maps output anomalies back to structural distribution shifts, allowing targeted dataset expansion that increases classification margins up to 34%.
+                            </p>
+                            <span class="inline-flex items-center text-xs text-sky-600 font-mono mt-4 font-bold gap-1 group-hover:underline">
+                                🔗 CrossRef Core Repository Link &rarr;
+                            </span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="https://doi.org/10.1109/TR.2021.3074750" target="_blank" class="group block p-6 bg-white border border-slate-200 rounded-xl hover:border-sky-400 hover:shadow-md transition-all shadow-sm">
+                    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <span class="text-[11px] font-mono tracking-widest bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-1 rounded uppercase font-bold">IEEE Transactions on Reliability [2021-2022]</span>
+                            <h3 class="text-xl font-bold text-slate-900 mt-3 group-hover:text-sky-600 transition-colors">Supporting DNNs Safety Analysis and Retraining Through Heatmap-Based Unsupervised Learning</h3>
+                            <p class="text-xs font-mono text-sky-600 mt-1 font-bold">Published in IEEE Transactions on Reliability & presented at 32nd ISSRE, China</p>
+                            <p class="text-sm text-slate-600 mt-3 italic bg-slate-50 p-4 rounded border border-slate-200">
+                                <strong>Abstract:</strong> Focuses on structural functional reliability verification schemes for vision models under adverse weather layers. The research pairs pixel-level saliency heatmaps with unsupervised learning models to safely quantify system variance thresholds before actual edge hardware deployment takes place.
+                            </p>
+                            <span class="inline-flex items-center text-xs text-sky-600 font-mono mt-4 font-bold gap-1 group-hover:underline">
+                                🔗 CrossRef Core Repository Link &rarr;
+                            </span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="https://arxiv.org/abs/2211.10369" target="_blank" class="group block p-6 bg-white border border-slate-200 rounded-xl hover:border-sky-400 hover:shadow-md transition-all shadow-sm">
+                    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <span class="text-[11px] font-mono tracking-widest bg-slate-100 text-slate-700 border border-slate-200 px-2 py-1 rounded uppercase font-bold">arXiv Preprint [2022]</span>
+                            <h3 class="text-xl font-bold text-slate-900 mt-3 group-hover:text-sky-600 transition-colors">Vehicular Safety Applications: A Technical Survey</h3>
+                            <p class="text-xs font-mono text-sky-600 mt-1 font-bold">Published in Open-Source Academic Repositories (arXiv:2211.10369)</p>
+                            <p class="text-sm text-slate-600 mt-3 italic bg-slate-50 p-4 rounded border border-slate-200">
+                                <strong>Abstract:</strong> Provides a taxonomy detailing sensor fusion algorithms, safety architectures, and risk management modules used within production level ADAS pipelines. It contrasts traditional safety loops against adaptive data-driven deep learning controls.
+                            </p>
+                            <span class="inline-flex items-center text-xs text-sky-600 font-mono mt-4 font-bold gap-1 group-hover:underline">
+                                🔗 CrossRef Core Repository Link &rarr;
+                            </span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="https://doi.org/10.1109/TVT.2018.2807796" target="_blank" class="group block p-6 bg-white border border-slate-200 rounded-xl hover:border-sky-400 hover:shadow-md transition-all shadow-sm">
+                    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <span class="text-[11px] font-mono tracking-widest bg-slate-100 text-slate-700 border border-slate-200 px-2 py-1 rounded uppercase font-bold">IEEE TVT [2017-2018]</span>
+                            <h3 class="text-xl font-bold text-slate-900 mt-3 group-hover:text-sky-600 transition-colors">Vehicle Risk Assessment and Control for Lane-Keeping and Collision Avoidance at Urban and Highway Scenarios</h3>
+                            <p class="text-xs font-mono text-sky-600 mt-1 font-bold">Published in IEEE Transactions on Vehicular Technology (DOI: 10.1109/TVT.2018.2807796)</p>
+                            <p class="text-sm text-slate-600 mt-3 italic bg-slate-50 p-4 rounded border border-slate-200">
+                                <strong>Abstract:</strong> Details vehicle dynamic control models managing lane centering and collision mitigation loops. The methodology tracks trajectory patterns to predict lane-excursion hazards under changing friction coefficients on public highway lines.
+                            </p>
+                            <span class="inline-flex items-center text-xs text-sky-600 font-mono mt-4 font-bold gap-1 group-hover:underline">
+                                🔗 CrossRef Core Repository Link &rarr;
+                            </span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="https://doi.org/10.1109/MWSCAS.2018.8623896" target="_blank" class="group block p-6 bg-white border border-slate-200 rounded-xl hover:border-sky-400 hover:shadow-md transition-all shadow-sm">
+                    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <span class="text-[11px] font-mono tracking-widest bg-slate-100 text-slate-700 border border-slate-200 px-2 py-1 rounded uppercase font-bold">IEEE MWSCAS / ICM [2017-2018]</span>
+                            <h3 class="text-xl font-bold text-slate-900 mt-3 group-hover:text-sky-600 transition-colors">Dual-Mode Forward Collision Avoidance & Trajectory Assessment via V2V Systems</h3>
+                            <p class="text-xs font-mono text-sky-600 mt-1 font-bold">Presented at the 61st IEEE Midwest Symposium on Circuits and Systems & 29th International Conference on Microelectronics</p>
+                            <p class="text-sm text-slate-600 mt-3 italic bg-slate-50 p-4 rounded border border-slate-200">
+                                <strong>Abstract:</strong> Explores the inclusion of 5G decentralized vehicle-to-vehicle (V2V) messaging to exchange real-time speed vectors. The paper outlines microelectronic algorithmic layouts designed to mitigate sudden multi-car piling accidents across low-visibility urban corridors.
+                            </p>
+                            <span class="inline-flex items-center text-xs text-sky-600 font-mono mt-4 font-bold gap-1 group-hover:underline">
+                                🔗 CrossRef Core Repository Link &rarr;
+                            </span>
+                        </div>
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-slate-200 bg-white py-8 text-center text-xs font-mono text-slate-500 font-bold">
+        <p>&copy; 2026 Dr. Hazem Fahmy. Structured via algorithmic functional safety guidelines.</p>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('neuralCanvas');
+        const ctx = canvas.getContext('2d');
+        let nodes = [];
+
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', setCanvasSize);
+        setCanvasSize();
+
+        class NeuralNode {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.dx = (Math.random() - 0.5) * 0.3;
+                this.dy = (Math.random() - 0.5) * 0.3;
+                this.r = Math.random() * 1.5 + 1.5;
+            }
+            update() {
+                this.x += this.dx;
+                this.y += this.dy;
+                if (this.x < 0 || this.x > canvas.width) this.dx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.dy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(2, 132, 199, 0.25)';
+                ctx.fill();
+            }
+        }
+
+        function buildNetwork() {
+            nodes = [];
+            const elementDensity = Math.min(Math.floor(canvas.width / 14), 90);
+            for(let i=0; i<elementDensity; i++) nodes.push(new NeuralNode());
+        }
+        buildNetwork();
+
+        function renderStream() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for(let i=0; i<nodes.length; i++) {
+                nodes[i].update();
+                nodes[i].draw();
+                for(let j=i+1; j<nodes.length; j++) {
+                    const diffX = nodes[i].x - nodes[j].x;
+                    const diffY = nodes[i].y - nodes[j].y;
+                    const spatialDistance = Math.sqrt(diffX*diffX + diffY*diffY);
+                    if(spatialDistance < 140) {
+                        ctx.beginPath();
+                        ctx.moveTo(nodes[i].x, nodes[i].y);
+                        ctx.lineTo(nodes[j].x, nodes[j].y);
+                        ctx.strokeStyle = `rgba(2, 132, 199, ${0.12 * (1 - spatialDistance/140)})`;
+                        ctx.lineWidth = 0.7;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(renderStream);
+        }
+        renderStream();
+
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('active');
+            });
+        }, { threshold: 0.05 });
+        document.querySelectorAll('.reveal').forEach(node => scrollObserver.observe(node));
+    </script>
+</body>
+</html>
