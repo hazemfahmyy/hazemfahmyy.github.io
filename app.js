@@ -483,6 +483,152 @@ if (currentStoryStep === 1) {
                 }
             });
         }
+        else if (currentStoryStep === 3) {
+            // ----------------------------------------------------
+            // PHASE 3: REAL-SIM GAP & TRANSFORMER PARAMETER EXTRACTION
+            // ----------------------------------------------------
+            
+            // Define responsive horizontal layout zones
+            const realX = cw * 0.22;
+            const netX = cw * 0.5;
+            const simX = cw * 0.78;
+            const centerY = ch / 2;
+
+            // 1. REAL DOMAIN (Noisy, jittery input sensor data)
+            // Simulates uncertainty and varied illumination in raw image clusters
+            const jitter = () => (Math.random() - 0.5) * 6; 
+            
+            // Base skeletal keypoints (Wrist, Thumb, Index, Middle, Ring)
+            const skeleton = [
+                { id: 0, px: 0, py: 40 },   
+                { id: 1, px: -25, py: -15 }, 
+                { id: 2, px: -10, py: -45 }, 
+                { id: 3, px: 15, py: -50 },  
+                { id: 4, px: 35, py: -30 }   
+            ];
+
+            ctx.save();
+            ctx.translate(realX, centerY);
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)'; // Slate-400
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            
+            // Draw messy, unstable connections
+            for (let i = 0; i < skeleton.length; i++) {
+                const jx = skeleton[i].px + jitter();
+                const jy = skeleton[i].py + jitter();
+                if (i === 0) ctx.moveTo(jx, jy);
+                else ctx.lineTo(jx, jy);
+                
+                // Red highlight indicating domain uncertainty/noise
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.7)'; 
+                ctx.fillRect(jx - 2, jy - 2, 4, 4);
+            }
+            ctx.stroke();
+            ctx.restore();
+
+            // 2. TRANSFORMER NETWORK (Parameter Extraction)
+            // Pulsing attention core
+            const pulse = Math.abs(Math.sin(time * 3));
+            ctx.fillStyle = `rgba(14, 165, 233, ${0.05 + pulse * 0.15})`; // Sky blue glow
+            ctx.beginPath();
+            ctx.arc(netX, centerY, 45, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.strokeStyle = '#0ea5e9';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 6]); // Dashed active boundary
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Inner Core styling
+            ctx.beginPath();
+            ctx.arc(netX, centerY, 35, 0, Math.PI * 2);
+            ctx.fillStyle = '#0f172a'; // Deep slate background
+            ctx.fill();
+            
+            ctx.font = "bold 9px monospace";
+            ctx.fillStyle = '#38bdf8';
+            ctx.textAlign = "center";
+            ctx.fillText("MULTI-VIEW", netX, centerY - 6);
+            ctx.fillText("TRANSFORMER", netX, centerY + 8);
+
+            // Data flow pipelines connecting the domains
+            const drawDataStream = (startX, endX, color) => {
+                ctx.beginPath();
+                ctx.moveTo(startX, centerY);
+                ctx.lineTo(endX, centerY);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                
+                // Animated data packet traveling across the gap
+                const streamDist = endX - startX;
+                const packetX = startX + ((time * 120) % streamDist);
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(packetX, centerY, 3, 0, Math.PI * 2);
+                ctx.fill();
+            };
+            
+            // Real -> Transformer (Gray/Uncertain flow)
+            drawDataStream(realX + 45, netX - 50, 'rgba(148, 163, 184, 0.3)');
+            // Transformer -> Sim (Emerald/Canonical flow)
+            drawDataStream(netX + 50, simX - 45, 'rgba(16, 185, 129, 0.4)');
+
+            // 3. SIM DOMAIN (Canonical Synthetic Generation)
+            ctx.save();
+            ctx.translate(simX, centerY);
+            
+            // Smooth, calculated robotic rotation simulating parameter application
+            const smoothAngle = Math.sin(time * 0.8) * 0.2;
+            ctx.rotate(smoothAngle);
+
+            // Perfect, clean geometry geometry lines
+            ctx.strokeStyle = 'rgba(16, 185, 129, 0.9)'; // Emerald
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            for (let i = 0; i < skeleton.length; i++) {
+                if (i === 0) ctx.moveTo(skeleton[i].px, skeleton[i].py);
+                else ctx.lineTo(skeleton[i].px, skeleton[i].py);
+            }
+            ctx.stroke();
+
+            // Perfect synthetic anchor nodes
+            skeleton.forEach(p => {
+                ctx.fillStyle = '#10b981'; // Solid Emerald
+                ctx.beginPath();
+                ctx.arc(p.px, p.py, 4.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+            ctx.restore();
+
+            // 4. TECHNICAL HUD OVERLAYS
+            ctx.textAlign = "center";
+            
+            // Real Data HUD
+            ctx.fillStyle = '#f87171'; // Rose/Red
+            ctx.fillText("REAL (NOISY INPUT)", realX, centerY - 70);
+            ctx.fillStyle = '#94a3b8'; // Slate
+            ctx.fillText(`Var(noise): ${(Math.random() * 8.5).toFixed(2)}`, realX, centerY - 55);
+
+            // Transformer Output HUD
+            ctx.fillStyle = '#e2e8f0'; 
+            ctx.fillText("PARAMETER MAPPING", netX, centerY - 70);
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillText(`[ Yaw, Pitch, J_θ ]`, netX, centerY - 55);
+
+            // Synthetic Target HUD
+            ctx.fillStyle = '#10b981'; // Emerald
+            ctx.fillText("SIM (CANONICAL TARGET)", simX, centerY - 70);
+            
+            // Simulating precise joint angle calculation over time
+            const targetIndexAngle = (75.0 + Math.sin(time * 0.8) * 12).toFixed(1);
+            ctx.fillText(`Index Joint: ${targetIndexAngle}°`, simX, centerY - 55);
+        }
         
         storyAnimId = requestAnimationFrame(draw);
     }
