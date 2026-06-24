@@ -92,6 +92,7 @@ async function loadPage(pageName) {
         console.error(`Failed to load ${pageName}.html`, error);
         root.innerHTML = `<div class="p-10 text-red-500 font-mono font-bold">System Error: Failed to load module '${pageName}'. Are you running via a local web server?</div>`;
     }
+    
 }
 
 // Fixed Router Event Hooks
@@ -113,44 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// Install library via terminal first: npm install serpapi
-const { getJson } = require("serpapi");
-
-async function updateScholarMetrics() {
-  try {
-    const response = await getJson({
-      engine: "google_scholar_author",
-      author_id: "SMq_99wAAAAJ", // Replace with your Scholar ID
-      api_key: "63115785bf7be5b43e8a3b27ad4212849f612f67d3dea20c234f0e2dcc43c5fb" 
-    });
-
-    // Extract citation stats from the response object matrix
-    const metricsTable = response.cited_by?.table;
-    
-    if (metricsTable && metricsTable.length > 0) {
-      const totalCitations = metricsTable[0].citations?.all || 0;
-      const hIndex = metricsTable[1].h_index?.all || 0;
-      const i10Index = metricsTable[2].i10_index?.all || 0;
-
-      console.log(`Citations: ${totalCitations}, h-Index: ${hIndex}, i10-Index: ${i10Index}`);
-      
-      return { totalCitations, hIndex, i10Index };
-    }
-  } catch (error) {
-    console.error("SerpApi Fetch Failure:", error);
-  }
-}
-// Inside your app.js logic where pubs.html mounts:
-fetch('scholar-stats.json')
-  .then(res => res.json())
-  .then(data => {
-      const citationContainer = document.getElementById('gs-citations');
-      if (citationContainer) {
-          citationContainer.textContent = data.citations;
-      }
-  });
-updateScholarMetrics();
-
+// Install librar
 /**
  * ==========================================
  * 2. SCROLL REVEAL ENGINE
@@ -298,7 +262,69 @@ function initStoryCanvas() {
             window.setStoryStep(step);
         };
     });
+    // Explicitly bind click event listeners to make chapters interactive
+    const buttons = document.querySelectorAll('.story-step');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // 1. Extract and update the story step globally
+            const step = parseInt(this.getAttribute('data-step')) || 1;
+            window.setStoryStep(step); // Updates currentStoryStep globally
 
+            // 2. Visual Layer: Reset ALL buttons to the inactive white state
+            buttons.forEach(b => {
+                b.classList.remove('active', 'bg-slate-900', 'border-sky-500/30', 'text-white', 'shadow-md', 'shadow-sky-500/5');
+                b.classList.add('bg-white', 'border-slate-200', 'text-slate-700');
+                
+                // Retract the active left highlight bar down to 0px
+                const bar = b.querySelector('div');
+                if (bar) bar.style.width = '0px';
+                
+                // Reset chapter tag back to standard gray
+                const label = b.querySelector('span:first-of-type');
+                if (label) {
+                    label.classList.remove('text-sky-400');
+                    label.classList.add('text-slate-400');
+                }
+
+                // FIX: Target the main description text span and reset to dark slate text for visibility on white bg
+                const mainText = b.querySelector('span:last-of-type');
+                if (mainText) {
+                    mainText.classList.remove('text-slate-100');
+                    mainText.classList.add('text-slate-800');
+                }
+            });
+
+            // 3. Visual Layer: Promote the currently clicked item into an active dark panel
+            this.classList.add('active', 'bg-slate-900', 'border-sky-500/30', 'text-white', 'shadow-md', 'shadow-sky-500/5');
+            this.classList.remove('bg-white', 'border-slate-200', 'text-slate-700');
+            
+            // Expand the left sidebar color bar out to 4px
+            const activeBar = this.querySelector('div');
+            if (activeBar) activeBar.style.width = '4px';
+            
+            // Turn the chapter tracking indicator sky blue
+            const activeLabel = this.querySelector('span:first-of-type');
+            if (activeLabel) {
+                activeLabel.classList.remove('text-slate-400');
+                activeLabel.classList.add('text-sky-400');
+            }
+
+            // FIX: Turn the description text white/bright so it is perfectly readable against the bg-slate-900
+            const activeMainText = this.querySelector('span:last-of-type');
+            if (activeMainText) {
+                activeMainText.classList.remove('text-slate-800');
+                activeMainText.classList.add('text-slate-100');
+            }
+
+            // 4. Update the real-time HUD mode text banner
+            const hudStatus = document.getElementById('vis-status');
+            if (hudStatus) {
+                if (step === 1) hudStatus.textContent = "SYS.MODE: MPC_KINEMATICS";
+                else if (step === 2) hudStatus.textContent = "SYS.MODE: XAI_LRP_ROOT_CAUSE";
+                else if (step === 3) hudStatus.textContent = "SYS.MODE: REAL_TO_SIM_TRANSFORMER";
+            }
+        });
+    });
     const ctx = canvas.getContext('2d');
     let cw = 0, ch = 0;
     

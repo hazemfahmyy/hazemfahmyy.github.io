@@ -91,11 +91,31 @@
     <div class="max-w-5xl">
         <h2 class="text-2xl font-black text-slate-900">The Journey Through Autonomous Control</h2>
         <p class="mt-2 text-slate-600">Select a research chapter below to run the live simulation module.</p>
-        <div class="mt-6 flex flex-wrap gap-3">
-            <button type="button" class="story-step active rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700" data-step="1">Classical Optimization &amp; Control</button>
-            <button type="button" class="story-step rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700" data-step="2">Trustworthy and eXplainable AI (xAI)</button>
-            <button type="button" class="story-step rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700" data-step="3">Simulation-Reality (sim-real) Gap</button>
-        </div>
+<div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 font-mono">
+    <button type="button" 
+            class="story-step active flex flex-col items-start p-4 text-left rounded-xl border bg-slate-900 border-sky-500/30 text-white shadow-md shadow-sky-500/5 transition-all duration-300 group relative overflow-hidden cursor-pointer" 
+            data-step="1">
+        <div class="absolute left-0 top-0 bottom-0 w-[4px] bg-sky-500 transition-all duration-300"></div>
+        <span class="text-[10px] font-black tracking-widest text-sky-400 uppercase">Chapter 01</span>
+        <span class="text-sm font-bold mt-1 text-slate-100 group-hover:text-white transition-colors">Classical Optimization &amp; Control</span>
+    </button>
+
+    <button type="button" 
+            class="story-step flex flex-col items-start p-4 text-left rounded-xl border bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50 shadow-sm transition-all duration-300 group relative overflow-hidden cursor-pointer" 
+            data-step="2">
+        <div class="absolute left-0 top-0 bottom-0 w-[0px] bg-sky-500 transition-all duration-300 group-hover:w-[4px]"></div>
+        <span class="text-[10px] font-black tracking-widest text-slate-400 group-hover:text-sky-500 transition-colors uppercase">Chapter 02</span>
+        <span class="text-sm font-bold mt-1 text-slate-800 transition-colors">Trustworthy &amp; Explainable AI</span>
+    </button>
+
+    <button type="button" 
+            class="story-step flex flex-col items-start p-4 text-left rounded-xl border bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50 shadow-sm transition-all duration-300 group relative overflow-hidden cursor-pointer" 
+            data-step="3">
+        <div class="absolute left-0 top-0 bottom-0 w-[0px] bg-sky-500 transition-all duration-300 group-hover:w-[4px]"></div>
+        <span class="text-[10px] font-black tracking-widest text-slate-400 group-hover:text-sky-500 transition-colors uppercase">Chapter 03</span>
+        <span class="text-sm font-bold mt-1 text-slate-800 transition-colors">Simulation-Reality Gap</span>
+    </button>
+</div>
         <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-950 p-4 shadow-sm">
             <div id="vis-status" class="text-sm font-mono text-slate-300">SYS.MODE: MPC_KINEMATICS</div>
             <div class="relative mt-4 h-72 w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
