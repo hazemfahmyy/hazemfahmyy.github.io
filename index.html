@@ -3,8 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>Dr. Hazem Fahmy | Autonomous Systems R&D</title>
+    <meta name="description" content="Professional portfolio of Dr. Hazem Fahmy. Research Scientist specializing in Applied Deep Learning, Autonomous Systems, and Functional Safety (ISO 26262 / SOTIF) for cyber-physical architectures.">
+    <meta name="keywords" content="Hazem Fahmy, Ph.D., Deep Learning, Autonomous Systems, Functional Safety, ISO 26262, SOTIF, AI Safety, Machine Learning Debugging, XAI, MLOps, Computer Vision">
+    <meta name="author" content="Dr. Hazem Fahmy">
+    <link rel="canonical" href="https://yourdomain.com/">
+
+    <meta property="og:type" content="profile">
+    <meta property="og:title" content="Dr. Hazem Fahmy | Autonomous Systems R&D & AI Safety">
+    <meta property="og:description" content="Discover automated debugging, explainable AI (XAI), and verification frameworks for safety-critical deep learning deployment.">
+    <meta property="og:url" content="https://yourdomain.com/">
+    <meta property="og:image" content="https://yourdomain.com/assets/og-preview-card.jpg">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Hazem Fahmy",
+      "jobTitle": "Research Scientist & Lecturer",
+      "alumniOf": {
+        "@type": "EducationalOrganization",
+        "name": "Université du Luxembourg"
+      },
+      "worksFor": {
+        "@type": "EducationalOrganization",
+        "name": "Zewail University of Science & Technology"
+      },
+      "knowsAbout": ["Deep Learning", "Autonomous Systems", "Functional Safety", "ISO 26262", "Computer Science"],
+      "sameAs": [
+        "https://www.linkedin.com/in/hazem-fahmy/",
+        "https://github.com/hazemfahmyy"
+      ]
+    }
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
     <style>
         :root {
             --color-bg: #f8fafc;
@@ -23,48 +58,58 @@
         .reveal { opacity: 0; transform: translateY(20px); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
         
-        /* Component Specific Styles */
-        .skill-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-        .skill-dot.active { background-color: #0ea5e9; box-shadow: 0 0 6px rgba(14, 165, 233, 0.4); }
-        .skill-dot.inactive { background-color: #e2e8f0; }
-        
-        .story-step { cursor: pointer; transition: all 0.3s ease; padding-left: 1.5rem; border-left: 3px solid #e2e8f0; opacity: 0.6; position: relative; }
-        .story-step:hover { opacity: 0.9; border-left-color: #94a3b8; }
-        .story-step.active { opacity: 1; border-left-color: #0ea5e9; }
-        .story-step::before { content: ''; position: absolute; left: -7px; top: 0; width: 11px; height: 11px; border-radius: 50%; background-color: #e2e8f0; transition: all 0.3s ease; }
-        .story-step.active::before { background-color: #0ea5e9; box-shadow: 0 0 10px rgba(14, 165, 233, 0.5); }
-        .vis-container { background: radial-gradient(circle at center, #0f172a 0%, #020617 100%); box-shadow: inset 0 0 30px rgba(0,0,0,0.8); }
+        /* Mobile Menu Drawer Transitions */
+        #mobile-drawer { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease; }
+        #mobile-drawer.hidden-drawer { transform: translateY(-100%); opacity: 0; pointer-events: none; }
     </style>
 </head>
-<body class="text-slate-800 antialiased relative text-[17px] leading-relaxed">
+<body class="text-slate-600 selection:bg-sky-500/10 selection:text-sky-600 relative">
 
-    <canvas id="neuralCanvas" class="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none opacity-40"></canvas>
-    <div class="fixed inset-0 hud-overlay -z-10 pointer-events-none"></div>
+    <canvas id="neuralCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 opacity-40"></canvas>
 
-    <div class="w-full fixed top-0 z-50 flex justify-center pt-4 pointer-events-none px-4">
-        <header class="w-full max-w-5xl pointer-events-auto bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-2xl transition-all duration-300">
-            <div class="px-6 h-16 flex items-center justify-between">
-                <a href="#home" class="group flex items-center gap-3 font-mono tracking-tight">
-                    <div class="relative flex h-2.5 w-2.5">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-600"></span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-lg font-black text-slate-900 tracking-widest group-hover:text-sky-600 transition-colors">HAZEM FAHMY</span>
-                        <span class="text-[10px] bg-slate-100 text-slate-500 border border-slate-200 px-1.5 py-0.5 rounded uppercase tracking-widest font-semibold">Ph.D.</span>
-                    </div>
-                </a>
-                <nav class="hidden md:flex items-center gap-2 font-mono text-xs uppercase tracking-wider font-bold" id="nav-menu">
-                    <a href="#home" data-target="home" class="nav-link px-4 py-2 text-sky-600 bg-sky-50 border border-sky-100 rounded-lg shadow-sm transition-all">Home</a>
-                    <a href="#pubs" data-target="pubs" class="nav-link px-4 py-2 text-sky-600 bg-sky-50 border border-sky-100 rounded-lg shadow-sm transition-all">Projects</a>
-                    <a href="#exp" data-target="exp" class="nav-link px-4 py-2 text-sky-600 bg-sky-50 border border-sky-100 rounded-lg shadow-sm transition-all">Experience</a>
-                </nav>
-            </div>
-        </header>
-    </div>
+    <header class="fixed top-0 left-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-200/80 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <a href="#home" data-target="home" class="nav-link flex items-center gap-3 group">
+                <div class="relative flex h-2.5 w-2.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-600"></span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-base sm:text-lg font-black text-slate-900 tracking-widest group-hover:text-sky-600 transition-colors">HAZEM FAHMY</span>
+                    <span class="text-[9px] bg-slate-100 text-slate-500 border border-slate-200 px-1.5 py-0.5 rounded uppercase tracking-widest font-semibold">Ph.D.</span>
+                </div>
+            </a>
+            
+            <nav class="hidden md:flex items-center gap-2 font-mono text-xs uppercase tracking-wider font-bold" id="nav-menu">
+                <a href="#home" data-target="home" class="nav-link px-4 py-2 text-sky-600 bg-sky-50 border border-sky-100 rounded-lg shadow-sm transition-all">Home</a>
+                <a href="#pubs" data-target="pubs" class="nav-link px-4 py-2 text-slate-500 hover:text-sky-600 rounded-lg transition-all hover:bg-slate-50">Projects</a>
+                <a href="#exp" data-target="exp" class="nav-link px-4 py-2 text-slate-500 hover:text-sky-600 rounded-lg transition-all hover:bg-slate-50">Experience</a>
+            </nav>
 
-    <main id="app-root" class="max-w-6xl mx-auto px-6 relative z-10 pt-24 pb-16 min-h-screen">
-        </main>
+            <button id="menu-toggle" type="button" aria-label="Toggle navigation menu" class="md:hidden p-2 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+
+        <div id="mobile-drawer" class="hidden-drawer absolute top-16 left-0 w-full bg-white border-b border-slate-200 shadow-xl flex flex-col p-4 gap-2 font-mono text-sm uppercase tracking-wider font-bold md:hidden z-40">
+            <a href="#home" data-target="home" class="nav-link mobile-nav-item px-4 py-3 text-sky-600 bg-sky-50 border border-sky-100 rounded-xl transition-all">Home</a>
+            <a href="#pubs" data-target="pubs" class="nav-link mobile-nav-item px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl transition-all">Projects</a>
+            <a href="#exp" data-target="exp" class="nav-link mobile-nav-item px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl transition-all">Experience</a>
+        </div>
+    </header>
+
+    <main id="app-root" class="pt-24 min-h-screen"></main>
+
+    <button id="scrollToTopBtn" 
+            type="button"
+            aria-label="Scroll to top"
+            class="fixed bottom-6 right-6 z-[100] w-11 h-11 bg-white/80 backdrop-blur-md border border-slate-200 text-slate-500 rounded-xl shadow-lg flex items-center justify-center opacity-0 pointer-events-none scale-75 hover:text-sky-600 hover:border-sky-500/30 hover:bg-white hover:scale-105 active:scale-95 transition-all duration-300 group cursor-pointer">
+        <svg class="w-5 h-5 transform group-hover:-translate-y-0.5 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+        </svg>
+    </button>
 
     <script src="app.js"></script>
 </body>
