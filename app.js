@@ -112,6 +112,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+
+// Install library via terminal first: npm install serpapi
+const { getJson } = require("serpapi");
+
+async function updateScholarMetrics() {
+  try {
+    const response = await getJson({
+      engine: "google_scholar_author",
+      author_id: "SMq_99wAAAAJ", // Replace with your Scholar ID
+      api_key: "63115785bf7be5b43e8a3b27ad4212849f612f67d3dea20c234f0e2dcc43c5fb" 
+    });
+
+    // Extract citation stats from the response object matrix
+    const metricsTable = response.cited_by?.table;
+    
+    if (metricsTable && metricsTable.length > 0) {
+      const totalCitations = metricsTable[0].citations?.all || 0;
+      const hIndex = metricsTable[1].h_index?.all || 0;
+      const i10Index = metricsTable[2].i10_index?.all || 0;
+
+      console.log(`Citations: ${totalCitations}, h-Index: ${hIndex}, i10-Index: ${i10Index}`);
+      
+      return { totalCitations, hIndex, i10Index };
+    }
+  } catch (error) {
+    console.error("SerpApi Fetch Failure:", error);
+  }
+}
+// Inside your app.js logic where pubs.html mounts:
+fetch('scholar-stats.json')
+  .then(res => res.json())
+  .then(data => {
+      const citationContainer = document.getElementById('gs-citations');
+      if (citationContainer) {
+          citationContainer.textContent = data.citations;
+      }
+  });
+updateScholarMetrics();
+
 /**
  * ==========================================
  * 2. SCROLL REVEAL ENGINE
