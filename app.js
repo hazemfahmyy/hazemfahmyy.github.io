@@ -5,8 +5,18 @@
  */
 let storyAnimId = null;
 let bgAnimId = null;
-let storyLoopToken = 0; // Absolute guard against concurrent/ghost animation loops
+let storyLoopToken = 0; 
 let bgLoopToken = 0;
+
+// Track active window event handlers to prevent catastrophic memory leaks across page swaps
+let activeWindowListeners = [];
+
+function clearWindowListeners() {
+    activeWindowListeners.forEach(item => {
+        window.removeEventListener(item.type, item.listener);
+    });
+    activeWindowListeners = [];
+}
 
 async function loadPage(pageName) {
     const root = document.getElementById('app-root');
@@ -16,6 +26,9 @@ async function loadPage(pageName) {
     bgLoopToken++;
     if (storyAnimId) { cancelAnimationFrame(storyAnimId); storyAnimId = null; }
     if (bgAnimId) { cancelAnimationFrame(bgAnimId); bgAnimId = null; }
+
+    // Flush out dangling global resize triggers from previously destroyed page elements
+    clearWindowListeners();
 
     try {
         const response = await fetch(`${pageName}.html`);
@@ -35,8 +48,10 @@ async function loadPage(pageName) {
         initScrollObserver();
         
         if (pageName === 'home') {
-            initStoryCanvas(); 
-            initBgCanvas();
+            requestAnimationFrame(() => {
+                initStoryCanvas();
+                initBgCanvas();
+            });
         }
     } catch (error) {
         console.error(`Failed to load ${pageName}.html`, error);
@@ -44,9 +59,23 @@ async function loadPage(pageName) {
     }
 }
 
-// Router Event Hooks
-window.addEventListener('hashchange', () => loadPage(window.location.hash.substring(1) || 'home'));
-document.addEventListener('DOMContentLoaded', () => loadPage(window.location.hash.substring(1) || 'home'));
+// Fixed Router Event Hooks
+window.addEventListener('hashchange', (e) => {
+    let hash = window.location.hash.substring(1) || 'home';
+    
+    if (document.getElementById(hash)) {
+        return; // Safe exit out to handle native CSS smooth scroll targets smoothly
+    }
+    
+    loadPage(hash);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    let hash = window.location.hash.substring(1) || 'home';
+    if (!document.getElementById(hash)) {
+        loadPage(hash);
+    }
+});
 
 /**
  * ==========================================
@@ -59,7 +88,34 @@ function initScrollObserver() {
     }, { threshold: 0.05 });
     document.querySelectorAll('.reveal').forEach(node => observer.observe(node));
 }
+/**
+ * ==========================================
+ * SCROLL-TO-TOP TELEMETRY TRIGGER
+ * ==========================================
+ */
+document.addEventListener("DOMContentLoaded", () => {
+    const topButton = document.getElementById("scrollToTopBtn");
+    if (!topButton) return;
 
+    // Show button when page drops past 400 vertical viewport pixels
+    window.addEventListener("scroll", () => {
+        if (window.scrollY > 400) {
+            topButton.classList.remove("opacity-0", "pointer-events-none", "scale-75");
+            topButton.classList.add("opacity-100", "pointer-events-all", "scale-100");
+        } else {
+            topButton.classList.remove("opacity-100", "pointer-events-all", "scale-100");
+            topButton.classList.add("opacity-0", "pointer-events-none", "scale-75");
+        }
+    });
+
+    // Execute smooth scrolling mechanics on trigger activation
+    topButton.addEventListener("click", () => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    });
+});
 /**
  * ==========================================
  * 3. AMBIENT BACKGROUND NEURAL NETWORK
@@ -75,10 +131,14 @@ function initBgCanvas() {
     const myBgToken = bgLoopToken;
 
     function setBgSize() { 
+        if (!bgCanvas) return;
         bgCanvas.width = window.innerWidth; 
         bgCanvas.height = window.innerHeight; 
     }
+    
+    // Register event handler with architectural tracker
     window.addEventListener('resize', setBgSize); 
+    activeWindowListeners.push({ type: 'resize', listener: setBgSize });
     setBgSize();
 
     class BgNode {
@@ -147,7 +207,7 @@ window.setStoryStep = function(step) {
 
     const txt = document.getElementById('vis-status');
     if (txt) {
-        if (step === 2) txt.innerText = "SYS.MODE: YOLOV8_SEGMENTATION_PIPELINE";
+        if (step === 2) txt.innerText = "SYS.MODE: XAI";
         else if (step === 3) txt.innerText = "SYS.MODE: XAI_LRP_BACKPROPAGATION";
         else txt.innerText = "SYS.MODE: MPC_KINEMATICS";
     }
@@ -157,27 +217,57 @@ function initStoryCanvas() {
     const canvas = document.getElementById('storyCanvas');
     if(!canvas) return;
 
+    // Explicitly bind click event listeners to make chapters interactive
+    document.querySelectorAll('.story-step').forEach(el => {
+        el.onclick = function() {
+            const step = parseInt(this.getAttribute('data-step'));
+            window.setStoryStep(step);
+        };
+    });
+
     const ctx = canvas.getContext('2d');
-    let cw, ch;
+    let cw = 0, ch = 0;
     
     const myStoryToken = storyLoopToken; 
 
     function setSize() { 
+        if (!canvas || !canvas.parentElement) return;
         const rect = canvas.parentElement.getBoundingClientRect(); 
         const dpr = window.devicePixelRatio || 1;
-        canvas.width = rect.width * dpr; 
-        canvas.height = rect.height * dpr; 
-        ctx.scale(dpr, dpr);
-        canvas.style.width = `${rect.width}px`;
-        canvas.style.height = `${rect.height}px`;
+        
         cw = rect.width;
         ch = rect.height;
+        
+        canvas.width = cw * dpr; 
+        canvas.height = ch * dpr; 
+        ctx.scale(dpr, dpr);
+        canvas.style.width = `${cw}px`;
+        canvas.style.height = `${ch}px`;
     }
+    
+    // Safe memory-managed tracking registration
     window.addEventListener('resize', setSize); 
+    activeWindowListeners.push({ type: 'resize', listener: setSize });
+    
     setSize(); 
     
     function draw() {
         if (myStoryToken !== storyLoopToken) return; 
+        
+        // Anti-Thrashing Optimization Strategy:
+        // Safely check dimensions without causing forced-layout render blocking loop locks.
+        if ((cw === 0 || ch === 0) && canvas.parentElement) {
+            const currentRect = canvas.parentElement.getBoundingClientRect();
+            if (currentRect.width > 0 && currentRect.height > 0) {
+                setSize();
+            }
+        }
+
+        // Keep loop ticking alive safely even if rendering panel boundaries collapse
+        if (cw === 0 || ch === 0) {
+            storyAnimId = requestAnimationFrame(draw);
+            return;
+        }
         
         ctx.clearRect(0, 0, cw, ch);
         time += 0.02;
@@ -187,27 +277,24 @@ function initStoryCanvas() {
         ctx.lineWidth = 1;
         for(let i=0; i<cw; i+=40) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, ch); ctx.stroke(); }
         for(let i=0; i<ch; i+=40) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(cw, i); ctx.stroke(); }
-
-        if (currentStoryStep === 1) { 
+if (currentStoryStep === 1) { 
             // ----------------------------------------------------
-            // PHASE 1: MPC KINEMATICS (Dynamic Real-Time Highway Flow)
+            // PHASE 1: MPC KINEMATICS (Discrete Control Loop Simulation)
             // ----------------------------------------------------
-            // Compute a horizontal scroll offset based on speed
-            const scrollX = time * 140; 
+            // Static lane center definition
+            const getRoadY = (x) => ch/2 + Math.sin(x * 0.007) * 45 + Math.cos(x * 0.003) * 20;
             
-            // Road Math shifts X linearly, moving curves perfectly from right to left
-            const getRoadY = (x) => ch/2 + Math.sin((x + scrollX) * 0.007) * 45 + Math.cos((x + scrollX) * 0.003) * 20;
-            
-            // Outer Road Left/Right Boundaries
+            // Draw static top boundary
             ctx.beginPath(); ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; ctx.lineWidth = 3;
             for(let x=0; x<cw; x+=10) { let ry = getRoadY(x); x===0 ? ctx.moveTo(x, ry-50) : ctx.lineTo(x, ry-50); }
             ctx.stroke();
             
+            // Draw static bottom boundary
             ctx.beginPath();
             for(let x=0; x<cw; x+=10) { let ry = getRoadY(x); x===0 ? ctx.moveTo(x, ry+50) : ctx.lineTo(x, ry+50); }
             ctx.stroke();
             
-            // Centerline Track
+            // Draw static centerline
             ctx.save();
             ctx.beginPath(); 
             ctx.setLineDash([12, 18]); 
@@ -217,26 +304,54 @@ function initStoryCanvas() {
             ctx.stroke(); 
             ctx.restore();
 
-            // Ego-Vehicle Calculations
-            const carX = cw * 0.25; 
-            const carY = getRoadY(carX); 
-            const lookAheadY = getRoadY(carX + 8);
-            // Dynamic heading angle shifts fluidly to follow road profile slope
-            const headingAngle = Math.atan2(lookAheadY - carY, 8);
+            // Continuous forward longitudinal progress
+            const carX = (time * 140) % (cw + 400) - 100; 
 
-            // Draw Adaptive MPC Horizon Preview Path
-            // Calculates points forward in coordinate space to visualize upcoming trajectory
+            // DISCRETE CONTROLLER MATH: Simulate a 4Hz control loop update interval
+            const controlHz = 4.0; 
+            const currentCycle = Math.floor(time * controlHz);
+            const cycleProgress = (time * controlHz) % 1; // Linear progress (0 to 1) inside current timestep
+            
+            // Function to generate pseudo-random tracking target offsets away from the centerline
+            const getTargetOffset = (c) => Math.sin(c * 1.3) * 15 + Math.cos(c * 0.7) * 6;
+            
+            const prevTarget = getTargetOffset(currentCycle - 1);
+            const currentTarget = getTargetOffset(currentCycle);
+            
+            // Aggressive cubic ease-out curve models the sudden response of the steering actuator adjusting at step start
+            const steerEase = 1 - Math.pow(1 - cycleProgress, 3);
+            const lateralOffset = prevTarget + (currentTarget - prevTarget) * steerEase;
+            
+            // Establish actual off-center vehicle Y coordinate
+            const carY = getRoadY(carX) + lateralOffset; 
+
+            // CALCULATE HEADING: Look an infinitesimal step ahead in time to match actual composite velocity vector
+            const dt = 0.015;
+            const nextTime = time + dt;
+            const nextCarX = (nextTime * 140) % (cw + 400) - 100;
+            const nextCycle = Math.floor(nextTime * controlHz);
+            const nextProgress = (nextTime * controlHz) % 1;
+            const nextEase = 1 - Math.pow(1 - nextProgress, 3);
+            const nextLateralOffset = getTargetOffset(nextCycle - 1) + (getTargetOffset(nextCycle) - getTargetOffset(nextCycle - 1)) * nextEase;
+            const nextCarY = getRoadY(nextCarX) + nextLateralOffset;
+            
+            const headingAngle = Math.atan2(nextCarY - carY, nextCarX - carX);
+
+            // DRAW MPC HORIZON: Plots path showing the vehicle predicting recovery back onto the centerline
             ctx.beginPath(); 
             ctx.strokeStyle = '#f59e0b'; 
             ctx.lineWidth = 2.5; 
             ctx.moveTo(carX, carY);
             for(let step=1; step<=25; step++) {
                 let simX = carX + (step * 11);
-                ctx.lineTo(simX, getRoadY(simX));
+                let horizonRatio = step / 25;
+                // The mathematical horizon model plans an exponential convergence curve back to center (offset -> 0)
+                let predictedOffset = lateralOffset * Math.pow(1 - horizonRatio, 1.6);
+                ctx.lineTo(simX, getRoadY(simX) + predictedOffset);
             }
             ctx.stroke();
 
-            // Ego-Vehicle Chassis rendering
+            // Translate and rotate the Ego vehicle chassis
             ctx.save(); 
             ctx.translate(carX, carY);
             ctx.rotate(headingAngle);
@@ -246,70 +361,23 @@ function initStoryCanvas() {
             ctx.lineWidth = 2;
             ctx.strokeRect(-20, -11, 40, 22);
             
-            // Forward Orientation Indicator Vector
+            // Directional heading vector pointer
             ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(35, 0);
             ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2; ctx.stroke();
             ctx.restore();
             
-            // Diagnostic HUD Overlay Metadata
+            // Dynamic HUD Text overlays following the off-center vehicle
             ctx.fillStyle = '#0ea5e9'; ctx.font = "10px monospace"; 
             ctx.fillText("EGO_ACTUATOR_NODE", carX - 30, carY - 25);
             ctx.fillStyle = '#f59e0b';
             ctx.fillText("MPC_PREDICTION_HORIZON (N=25)", carX + 40, carY - 40);
-            
-        } else if (currentStoryStep === 2) { 
+         } else if (currentStoryStep === 2) { 
             // ----------------------------------------------------
-            // PHASE 2: YOLOv8 SEMANTIC SEGMENTATION & CLASSIFICATION
-            // ----------------------------------------------------
-            let carX = cw/2 - 80 + Math.sin(time)*30;
-            let carY = ch/2 + Math.cos(time*0.5)*15;
-            
-            let tX = cw/4 + Math.cos(time*0.8)*20;
-            let tY = ch/2 + 70 + Math.sin(time*1.2)*10;
-
-            // 1. Car Shape
-            ctx.fillStyle = '#64748b';
-            ctx.beginPath();
-            ctx.moveTo(carX, carY+15); ctx.lineTo(carX+20, carY); ctx.lineTo(carX+70, carY); ctx.lineTo(carX+90, carY+15); ctx.lineTo(carX+90, carY+35); ctx.lineTo(carX, carY+35);
-            ctx.fill();
-            ctx.fillStyle = '#1e293b'; 
-            ctx.fillRect(carX+10, carY+30, 20, 10); ctx.fillRect(carX+60, carY+30, 20, 10);
-
-            // 2. Truck Shape
-            ctx.fillStyle = '#475569';
-            ctx.beginPath();
-            ctx.moveTo(tX, tY+10); ctx.lineTo(tX+30, tY+10); ctx.lineTo(tX+40, tY); ctx.lineTo(tX+120, tY); ctx.lineTo(tX+120, tY+40); ctx.lineTo(tX, tY+40);
-            ctx.fill();
-            ctx.fillStyle = '#1e293b'; 
-            ctx.fillRect(tX+15, tY+35, 20, 12); ctx.fillRect(tX+80, tY+35, 20, 12);
-
-            // YOLO Graphics Overlays
-            ctx.fillStyle = 'rgba(14, 165, 233, 0.4)'; 
-            ctx.beginPath();
-            ctx.moveTo(carX, carY+15); ctx.lineTo(carX+20, carY); ctx.lineTo(carX+70, carY); ctx.lineTo(carX+90, carY+15); ctx.lineTo(carX+90, carY+35); ctx.lineTo(carX, carY+35);
-            ctx.fill();
-            ctx.strokeStyle = '#0ea5e9'; ctx.lineWidth = 2;
-            ctx.strokeRect(carX-2, carY-2, 94, 44); 
-            ctx.fillStyle = '#0ea5e9'; ctx.fillRect(carX-2, carY-18, 70, 16); 
-            ctx.fillStyle = '#fff'; ctx.font = "bold 10px monospace"; ctx.fillText("car 0.98", carX+2, carY-6);
-
-            ctx.fillStyle = 'rgba(245, 158, 11, 0.4)'; 
-            ctx.beginPath();
-            ctx.moveTo(tX, tY+10); ctx.lineTo(tX+30, tY+10); ctx.lineTo(tX+40, tY); ctx.lineTo(tX+120, tY); ctx.lineTo(tX+120, tY+40); ctx.lineTo(tX, tY+40);
-            ctx.fill();
-            ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2;
-            ctx.strokeRect(tX-2, tY-2, 124, 49); 
-            ctx.fillStyle = '#f59e0b'; ctx.fillRect(tX-2, tY-18, 85, 16); 
-            ctx.fillStyle = '#fff'; ctx.font = "bold 10px monospace"; ctx.fillText("truck 0.91", tX+2, tY-6);
-
-        } else if (currentStoryStep === 3) { 
-            // ----------------------------------------------------
-            // PHASE 3: XAI DIAGNOSTICS (Layer-wise Relevance Backprop)
+            // PHASE 3: XAI DIAGNOSTICS
             // ----------------------------------------------------
             const layers = [5, 7, 7, 2]; 
             const layerSpacing = cw / (layers.length + 1);
             const nodeSpacing = 35;
-            
             let nodes = [];
             
             layers.forEach((count, i) => {
@@ -327,7 +395,6 @@ function initStoryCanvas() {
                 }
             });
 
-            // Draw Connections
             nodes.forEach(n1 => {
                 nodes.forEach(n2 => {
                     if (n2.layer === n1.layer + 1) {
@@ -353,7 +420,6 @@ function initStoryCanvas() {
                 });
             });
 
-            // Draw Nodes
             nodes.forEach(n => {
                 ctx.beginPath();
                 ctx.arc(n.x, n.y, 8, 0, Math.PI*2);
