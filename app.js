@@ -7,7 +7,42 @@ let storyAnimId = null;
 let bgAnimId = null;
 let storyLoopToken = 0; 
 let bgLoopToken = 0;
+/**
+ * ==========================================
+ * MOBILE SIDEBAR & NAVIGATION CONTROLLER
+ * ==========================================
+ */
+document.addEventListener("DOMContentLoaded", () => {
+    const menuToggle = document.getElementById("menu-toggle");
+    const mobileDrawer = document.getElementById("mobile-drawer");
 
+    // 1. Toggle the mobile sidebar drawer when the hamburger icon is clicked
+    if (menuToggle && mobileDrawer) {
+        menuToggle.addEventListener("click", () => {
+            mobileDrawer.classList.toggle("hidden-drawer");
+        });
+    }
+
+    // 2. Global Event Delegation for all navigation links (Desktop & Mobile)
+    document.addEventListener("click", (e) => {
+        // Check if the clicked element (or its parent) is a navigation link
+        const targetLink = e.target.closest(".nav-link");
+        if (!targetLink) return;
+        
+        const destination = targetLink.getAttribute("data-target");
+        if (destination) {
+            e.preventDefault(); // Prevent standard page jumping
+            
+            // Trigger your existing Single Page Application routing
+            loadPage(destination);
+            
+            // If the user clicked a link inside the mobile drawer, auto-close the drawer
+            if (mobileDrawer && !mobileDrawer.classList.contains("hidden-drawer")) {
+                mobileDrawer.classList.add("hidden-drawer");
+            }
+        }
+    });
+});
 // Track active window event handlers to prevent catastrophic memory leaks across page swaps
 let activeWindowListeners = [];
 
