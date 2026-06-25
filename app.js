@@ -195,7 +195,7 @@ function initBgCanvas() {
         draw() { 
             bgCtx.beginPath(); 
             bgCtx.arc(this.x, this.y, this.r, 0, Math.PI * 2); 
-            bgCtx.fillStyle = 'rgba(2, 132, 199, 0.25)'; 
+            bgCtx.fillStyle = 'rgba(2, 132, 199, 0.50)'; 
             bgCtx.fill(); 
         }
     }
@@ -217,7 +217,7 @@ function initBgCanvas() {
                     bgCtx.beginPath(); 
                     bgCtx.moveTo(bgNodes[i].x, bgNodes[i].y); 
                     bgCtx.lineTo(bgNodes[j].x, bgNodes[j].y);
-                    bgCtx.strokeStyle = `rgba(2, 132, 199, ${0.12 * (1 - dist/140)})`; 
+                    bgCtx.strokeStyle = `rgba(2, 132, 199, ${0.24 * (1 - dist/140)})`; 
                     bgCtx.stroke();
                 }
             }
@@ -378,100 +378,125 @@ function initStoryCanvas() {
         for(let i=0; i<cw; i+=40) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, ch); ctx.stroke(); }
         for(let i=0; i<ch; i+=40) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(cw, i); ctx.stroke(); }
 if (currentStoryStep === 1) { 
-            // ----------------------------------------------------
-            // PHASE 1: MPC KINEMATICS (Discrete Control Loop Simulation)
-            // ----------------------------------------------------
-            // Static lane center definition
-            const getRoadY = (x) => ch/2 + Math.sin(x * 0.007) * 45 + Math.cos(x * 0.003) * 20;
-            
-            // Draw static top boundary
-            ctx.beginPath(); ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; ctx.lineWidth = 3;
-            for(let x=0; x<cw; x+=10) { let ry = getRoadY(x); x===0 ? ctx.moveTo(x, ry-50) : ctx.lineTo(x, ry-50); }
-            ctx.stroke();
-            
-            // Draw static bottom boundary
-            ctx.beginPath();
-            for(let x=0; x<cw; x+=10) { let ry = getRoadY(x); x===0 ? ctx.moveTo(x, ry+50) : ctx.lineTo(x, ry+50); }
-            ctx.stroke();
-            
-            // Draw static centerline
-            ctx.save();
-            ctx.beginPath(); 
-            ctx.setLineDash([12, 18]); 
-            ctx.strokeStyle = 'rgba(16, 185, 129, 0.5)';
-            ctx.lineWidth = 2;
-            for(let x=0; x<cw; x+=10) { let ry = getRoadY(x); x===0 ? ctx.moveTo(x, ry) : ctx.lineTo(x, ry); }
-            ctx.stroke(); 
-            ctx.restore();
+    // ----------------------------------------------------
+    // PHASE 1: MPC KINEMATICS (Decoupled Smooth Control Loop Simulation)
+    // ----------------------------------------------------
+    // Static lane center definition
+    const getRoadY = (x) => ch/2 + Math.sin(x * 0.007) * 45 + Math.cos(x * 0.003) * 20;
+    
+    // Draw static top boundary
+    ctx.beginPath(); ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; ctx.lineWidth = 3;
+    for(let x=0; x<cw; x+=10) { let ry = getRoadY(x); x===0 ? ctx.moveTo(x, ry-50) : ctx.lineTo(x, ry-50); }
+    ctx.stroke();
+    
+    // Draw static bottom boundary
+    ctx.beginPath();
+    for(let x=0; x<cw; x+=10) { let ry = getRoadY(x); x===0 ? ctx.moveTo(x, ry+50) : ctx.lineTo(x, ry+50); }
+    ctx.stroke();
+    
+    // Draw static centerline
+    ctx.save();
+    ctx.beginPath(); 
+    ctx.setLineDash([12, 18]); 
+    ctx.strokeStyle = 'rgba(16, 185, 129, 0.5)';
+    ctx.lineWidth = 2;
+    for(let x=0; x<cw; x+=10) { let ry = getRoadY(x); x===0 ? ctx.moveTo(x, ry) : ctx.lineTo(x, ry); }
+    ctx.stroke(); 
+    ctx.restore();
 
-            // Continuous forward longitudinal progress
-            const carX = (time * 140) % (cw + 400) - 100; 
+    // Continuous forward longitudinal progress
+    const carX = (time * 140) % (cw + 400) - 100; 
 
-            // DISCRETE CONTROLLER MATH: Simulate a 4Hz control loop update interval
-            const controlHz = 4.0; 
-            const currentCycle = Math.floor(time * controlHz);
-            const cycleProgress = (time * controlHz) % 1; // Linear progress (0 to 1) inside current timestep
-            
-            // Function to generate pseudo-random tracking target offsets away from the centerline
-            const getTargetOffset = (c) => Math.sin(c * 1.3) * 15 + Math.cos(c * 0.7) * 6;
-            
-            const prevTarget = getTargetOffset(currentCycle - 1);
-            const currentTarget = getTargetOffset(currentCycle);
-            
-            // Aggressive cubic ease-out curve models the sudden response of the steering actuator adjusting at step start
-            const steerEase = 1 - Math.pow(1 - cycleProgress, 3);
-            const lateralOffset = prevTarget + (currentTarget - prevTarget) * steerEase;
-            
-            // Establish actual off-center vehicle Y coordinate
-            const carY = getRoadY(carX) + lateralOffset; 
+    // DISCRETE CONTROLLER CONFIG: 4Hz control loop update interval
+    const controlHz = 4.0; 
+    const currentCycle = Math.floor(time * controlHz);
+    const cycleProgress = (time * controlHz) % 1; // Linear progress (0 to 1) inside current timestep
+    
+    // Function to generate pseudo-random tracking target offsets away from the centerline
+    const getTargetOffset = (c) => Math.sin(c * 1.3) * 15 + Math.cos(c * 0.7) * 6;
+    
+    const prevTarget = getTargetOffset(currentCycle - 1);
+    const currentTarget = getTargetOffset(currentCycle);
+    
+    const dt = 0.015;
+    const nextTime = time + dt;
+    const nextCarX = (nextTime * 140) % (cw + 400) - 100;
+    const nextCycle = Math.floor(nextTime * controlHz);
+    const nextProgress = (nextTime * controlHz) % 1;
 
-            // CALCULATE HEADING: Look an infinitesimal step ahead in time to match actual composite velocity vector
-            const dt = 0.015;
-            const nextTime = time + dt;
-            const nextCarX = (nextTime * 140) % (cw + 400) - 100;
-            const nextCycle = Math.floor(nextTime * controlHz);
-            const nextProgress = (nextTime * controlHz) % 1;
-            const nextEase = 1 - Math.pow(1 - nextProgress, 3);
-            const nextLateralOffset = getTargetOffset(nextCycle - 1) + (getTargetOffset(nextCycle) - getTargetOffset(nextCycle - 1)) * nextEase;
-            const nextCarY = getRoadY(nextCarX) + nextLateralOffset;
-            
-            const headingAngle = Math.atan2(nextCarY - carY, nextCarX - carX);
+    // =========================================================================
+    // 1. RAW/JERKY PROFILE CALCULATIONS (Preserved exactly for the Green Arrow)
+    // =========================================================================
+    const steerEaseRaw = 1 - Math.pow(1 - cycleProgress, 3); // Aggressive snap profile
+    const lateralOffsetRaw = prevTarget + (currentTarget - prevTarget) * steerEaseRaw;
+    const carYRaw = getRoadY(carX) + lateralOffsetRaw;
+    
+    const nextEaseRaw = 1 - Math.pow(1 - nextProgress, 3);
+    const nextLateralOffsetRaw = getTargetOffset(nextCycle - 1) + (getTargetOffset(nextCycle) - getTargetOffset(nextCycle - 1)) * nextEaseRaw;
+    const nextCarYRaw = getRoadY(nextCarX) + nextLateralOffsetRaw;
+    
+    const headingAngleRaw = Math.atan2(nextCarYRaw - carYRaw, nextCarX - carX);
 
-            // DRAW MPC HORIZON: Plots path showing the vehicle predicting recovery back onto the centerline
-            ctx.beginPath(); 
-            ctx.strokeStyle = '#f59e0b'; 
-            ctx.lineWidth = 2.5; 
-            ctx.moveTo(carX, carY);
-            for(let step=1; step<=25; step++) {
-                let simX = carX + (step * 11);
-                let horizonRatio = step / 25;
-                // The mathematical horizon model plans an exponential convergence curve back to center (offset -> 0)
-                let predictedOffset = lateralOffset * Math.pow(1 - horizonRatio, 1.6);
-                ctx.lineTo(simX, getRoadY(simX) + predictedOffset);
-            }
-            ctx.stroke();
+    // =========================================================================
+    // 2. SMOOTHED PROFILE CALCULATIONS (Applied to Vehicle Body to damp out jerks)
+    // =========================================================================
+    // Replaced cubic snapping with a continuous cosine interpolation (Smoothstep equivalent)
+    const steerEaseSmooth = 0.5 - 0.5 * Math.cos(Math.PI * cycleProgress);
+    const lateralOffsetSmooth = prevTarget + (currentTarget - prevTarget) * steerEaseSmooth;
+    const carYSmooth = getRoadY(carX) + lateralOffsetSmooth; 
 
-            // Translate and rotate the Ego vehicle chassis
-            ctx.save(); 
-            ctx.translate(carX, carY);
-            ctx.rotate(headingAngle);
-            ctx.fillStyle = '#0f172a'; 
-            ctx.fillRect(-20, -11, 40, 22); 
-            ctx.strokeStyle = '#0ea5e9'; 
-            ctx.lineWidth = 2;
-            ctx.strokeRect(-20, -11, 40, 22);
-            
-            // Directional heading vector pointer
-            ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(35, 0);
-            ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2; ctx.stroke();
-            ctx.restore();
-            
-            // Dynamic HUD Text overlays following the off-center vehicle
-            ctx.fillStyle = '#0ea5e9'; ctx.font = "10px monospace"; 
-            ctx.fillText("EGO_ACTUATOR_NODE", carX - 30, carY - 25);
-            ctx.fillStyle = '#f59e0b';
-            ctx.fillText("MPC_PREDICTION_HORIZON (N=25)", carX + 40, carY - 40);
-         } else if (currentStoryStep === 2) { 
+    const nextEaseSmooth = 0.5 - 0.5 * Math.cos(Math.PI * nextProgress);
+    const nextLateralOffsetSmooth = getTargetOffset(nextCycle - 1) + (getTargetOffset(nextCycle) - getTargetOffset(nextCycle - 1)) * nextEaseSmooth;
+    const nextCarYSmooth = getRoadY(nextCarX) + nextLateralOffsetSmooth;
+    
+    const headingAngleSmooth = Math.atan2(nextCarYSmooth - carYSmooth, nextCarX - carX);
+
+    // =========================================================================
+    // 3. RENDERING THE COMPONENT LAYERS
+    // =========================================================================
+
+    // DRAW MPC HORIZON: Plots prediction curve originating smoothly from the vehicle chassis
+    ctx.beginPath(); 
+    ctx.strokeStyle = '#f59e0b'; 
+    ctx.lineWidth = 2.5; 
+    ctx.moveTo(carX, carYSmooth);
+    for(let step=1; step<=25; step++) {
+        let simX = carX + (step * 11);
+        let horizonRatio = step / 25;
+        let predictedOffset = lateralOffsetSmooth * Math.pow(1 - horizonRatio, 1.6);
+        ctx.lineTo(simX, getRoadY(simX) + predictedOffset);
+    }
+    ctx.stroke();
+
+    // LAYER A: Translate and rotate the Ego vehicle chassis using the SMOOTH profiles
+    ctx.save(); 
+    ctx.translate(carX, carYSmooth);
+    ctx.rotate(headingAngleSmooth);
+    ctx.fillStyle = '#0f172a'; 
+    ctx.fillRect(-20, -11, 40, 22); 
+    ctx.strokeStyle = '#0ea5e9'; 
+    ctx.lineWidth = 2;
+    ctx.strokeRect(-20, -11, 40, 22); 
+    ctx.restore();
+
+    // LAYER B: Render the Green Pointer attached to the vehicle center but rotating with the RAW jerky heading
+    ctx.save();
+    ctx.translate(carX, carYSmooth);
+    ctx.rotate(headingAngleRaw); // Keeps the green arrow sharp and dynamic as requested
+    ctx.beginPath(); 
+    ctx.moveTo(0, 0); 
+    ctx.lineTo(35, 0);
+    ctx.strokeStyle = '#10b981'; 
+    ctx.lineWidth = 2; 
+    ctx.stroke();
+    ctx.restore();
+    
+    // Dynamic HUD Text overlays following the stabilized vehicle coordinates
+    ctx.fillStyle = '#0ea5e9'; ctx.font = "10px monospace"; 
+    ctx.fillText("EGO_ACTUATOR_NODE", carX - 30, carYSmooth - 25);
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillText("MPC_PREDICTION_HORIZON (N=25)", carX + 40, carYSmooth - 40);
+} else if (currentStoryStep === 2) { 
             // ----------------------------------------------------
             // PHASE 3: XAI DIAGNOSTICS
             // ----------------------------------------------------
